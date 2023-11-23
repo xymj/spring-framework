@@ -4,8 +4,17 @@ dependencies {
     compile(project(":spring-beans"))
     compile(project(":spring-core"))
     compile(project(":spring-context"))
+    compile(project(":spring-aspects"))
+    compile(project(":spring-jdbc"))
+
+    // 添加此引用会加快spring容器启动，编译后会在META-INF目录下生成META-INF/spring.components文件，该文件中以key=value 形式保存信息。key为 类的全路径名， value 为 注解的全路径名。
+    // 文件包含被@Indexed注释的类的模式解析结果。当Spring应用上下文进行组件扫描时，META-INF/spring.components会被org.springframework.context.index.CandidateComponentsIndexLoader读取并加载，转换为CandidateComponentsIndex对象，此时组件扫描会读取CandidateComponentsIndex，而不进行实际扫描，从而提高组件扫描效率，减少应用启动时间。
+    // https://blog.csdn.net/qq_36882793/article/details/117667161
+    // compile(project(":spring-context-indexer"))
+
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly("org.projectlombok:lombok:1.18.24")
+    implementation 'mysql:mysql-connector-java:5.1.46'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
 //    runtimeClasspath files(sourceSets.main.output.resourcesDir)
