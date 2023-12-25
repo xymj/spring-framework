@@ -16,7 +16,10 @@ import javax.sql.DataSource;
 
 @Configuration // 不添此注解，不会进行包扫描，ConfigurationClassBeanDefinitionReader进行扫描bean的创建和初始化
 // @ComponentScans(value = {@ComponentScan(basePackages = "org.springframework.debug")})
-@ComponentScan(basePackages = "org.springframework.debug") // 路径不对会抛java.lang.IllegalArgumentException:
+@ComponentScan(basePackages = "org.springframework.debug",
+		excludeFilters = @ComponentScan.Filter(
+				type = FilterType.REGEX,
+				pattern = "org.springframework.debug.test.postprocessor.*")) // 路径不对会抛java.lang.IllegalArgumentException:
                                                            // @EnableAsync annotation metadata was
                                                            // not injected异常
 @EnableAspectJAutoProxy // 开启代理

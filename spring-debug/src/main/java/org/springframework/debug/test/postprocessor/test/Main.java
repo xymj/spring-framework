@@ -1,9 +1,9 @@
-package org.springframework.debug.postprocessor.test;
+package org.springframework.debug.test.postprocessor.test;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.debug.postprocessor.bean.BeanDefinitionRegistryPostProcessorBean;
-import org.springframework.debug.postprocessor.bean.BeanFactoryPostProcessorBean;
-import org.springframework.debug.postprocessor.config.PostProcessorAppConfig;
+import org.springframework.debug.test.postprocessor.bean.BeanDefinitionRegistryPostProcessorBean;
+import org.springframework.debug.test.postprocessor.bean.BeanFactoryPostProcessorBean;
+import org.springframework.debug.test.postprocessor.config.PostProcessorAppConfig;
 
 /**
  * @create 2023/11/24 11:28

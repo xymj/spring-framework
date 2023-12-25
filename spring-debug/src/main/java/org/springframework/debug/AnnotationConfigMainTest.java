@@ -11,8 +11,8 @@ public class AnnotationConfigMainTest {
         new AnnotationConfigApplicationContext(AppConfig.class);
     UserService userService = (UserService) applicationContext.getBean("userService");
     userService.test();
-    System.out.println(applicationContext.getBean("orderService"));
-    System.out.println(applicationContext.getBean("orderService1"));
+    System.out.println("orderService: " + applicationContext.getBean("orderService"));
+    System.out.println("orderService1: " + applicationContext.getBean("orderService1"));
 
   }
 }

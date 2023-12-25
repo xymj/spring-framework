@@ -1,4 +1,4 @@
-package org.springframework.debug.postprocessor.processor;
+package org.springframework.debug.test.postprocessor.processor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;

@@ -1,4 +1,4 @@
-package org.springframework.debug.postprocessor.processor;
+package org.springframework.debug.test.postprocessor.processor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.debug.postprocessor.bean.BeanDefinitionRegistryPostProcessorBean;
+import org.springframework.debug.test.postprocessor.bean.BeanDefinitionRegistryPostProcessorBean;
 import org.springframework.stereotype.Component;
 
 /**

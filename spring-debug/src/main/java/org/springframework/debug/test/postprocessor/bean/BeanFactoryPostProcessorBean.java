@@ -1,4 +1,4 @@
-package org.springframework.debug.postprocessor.bean;
+package org.springframework.debug.test.postprocessor.bean;
 
 import lombok.Getter;
 import lombok.Setter;
