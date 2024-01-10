@@ -78,13 +78,18 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method */
+	//  用于缓存已解析的构造函数或工厂方法
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
 	/** Package-visible field that marks the constructor arguments as resolved */
+	// 这个字段有两层含义：
+	// 一，标记构造函数是否已经完成解析。
+	// 二，标志这个bean的加载是否需要通过构造注入(autowireConstructor) 的方式加载。因为只有在autowireConstructor方法中才会将其置为true。
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments */
+	// 缓存解析好的构造函数的入参
 	@Nullable
 	Object[] resolvedConstructorArguments;
 

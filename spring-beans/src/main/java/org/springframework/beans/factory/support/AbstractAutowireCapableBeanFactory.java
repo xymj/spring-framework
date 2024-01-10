@@ -1119,50 +1119,69 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
+		// 解析bean，获取class
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
-
+		// beanClass != null && 当前类不是public && 不允许访问非公共构造函数和方法。抛出异常
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
-
+		// 1. 是否有bean的Supplier接口，如果有，通过回调来创建bean
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
+		// 2. 如果工厂方法不为空，则使用工厂方法初始化策略
+		// 通过@Bean注解方法注入的bean或者xml配置注入的BeanDefinition会存在这个值。而注入这个bean的方法就是工厂方法。后面会详细解读
 		if (mbd.getFactoryMethodName() != null) {
+			// 执行工厂方法，创建bean
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
 		// Shortcut when re-creating the same bean...
+		// 3. 尝试使用构造函数构建bean
+		// 经过上面两步，Spring确定没有其他方式来创建bean，所以打算使用构造函数来进行创建bean。 但是bean的构造函数可能有多个，需要确定使用哪一个。
+		// 这里实际上是一个缓存，resolved表示构造函数是否已经解析完成；autowireNecessary表示是否需要自动装配
 		boolean resolved = false;
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
+					// 一个类可能有多个不同的构造函数，每个构造函数参数列表不同，所以调用前需要根据参数锁定对应的构造函数或工厂方法
+					// 如果这个bean的构造函数或者工厂方法已经解析过了，会保存到 mbd.resolvedConstructorOrFactoryMethod 中。这里来判断是否已经解析过了。
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
 		}
+		// 如果已经解析过则使用功能解析好的构造函数方法，不需要再次解析。这里的是通过 mbd.resolvedConstructorOrFactoryMethod 属性来缓存解析过的构造函数。
 		if (resolved) {
 			if (autowireNecessary) {
+				// 4. 构造函数自动注入
+				// 就是根据传入的参数列表，来匹配到合适的构造函数进行bean 的创建
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
+				// 5. 使用默认构造函数构造
 				return instantiateBean(beanName, mbd);
 			}
 		}
 
 		// Candidate constructors for autowiring?
+		// 6. 根据参数解析构造函数，并将解析出来的构造函数缓存到mdb的resolvedConstructorOrFactoryMethod属性中
+		// 到这一步，说明 bean 是第一次加载，所以没有对构造函数进行相关缓存(resolved 为 false)
+		// 调用determineConstructorsFromBeanPostProcessors方法来获取指定的构造函数列表。
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
+		// 有候选构造函数 || 构造方式为构造注入 || 有构造函数入参 || 用于构造函数或工厂方法调用的显式参数args 不为null
+		// 则调用 autowireConstructor 方法
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
 		// No special handling: simply use no-arg constructor.
+		// 使用默认构造函数构造
 		return instantiateBean(beanName, mbd);
 	}
 
@@ -1176,13 +1195,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
-
+		// 使用临时变量保存currentlyCreatedBean当前值
 		String outerBean = this.currentlyCreatedBean.get();
+		// 将beanName设置到currentlyCreatedBean中，表示这是当前正在创建到bean
+		// currentlyCreatedBean.get()在getObjectForBeanInstance中会被调用
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			// 执行lambda表达式的 Supplier函数来生成一个实例对象
 			instance = instanceSupplier.get();
 		}
 		finally {
+			// 还原原来的临时变量
 			if (outerBean != null) {
 				this.currentlyCreatedBean.set(outerBean);
 			}
@@ -1190,10 +1213,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				this.currentlyCreatedBean.remove();
 			}
 		}
-
+		// 如果得到的实例为null，则会去创建一个空实例
 		if (instance == null) {
 			instance = new NullBean();
 		}
+		// 构造一个bean包装器，BeanWrapperImpl内初始化了几个参数，无其他逻辑
 		BeanWrapper bw = new BeanWrapperImpl(instance);
 		initBeanWrapper(bw);
 		return bw;
