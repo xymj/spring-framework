@@ -47,7 +47,16 @@ import org.springframework.aop.SpringProxy;
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	@Override
+	// 这里的参数 AdvisedSupport config 即是之前创建的ProxyFactory。这里又将其传递给了AopProxy
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		//optimize ： 用来控制通过CGlib 创建的代理是否使用激进的优化策略，一般默认false，对JDK动态代理无效。
+		//proxyTargetClass：若为true，则目标类本身被代理，而不是代理目标类的接口，创建 cglib代理。
+		//hasNoUserSuppliedProxyInterfaces：是否存在代理接口
+
+		//即：
+		//如果目标对象实现了接口，默认会采用JDK动态代理实现AOP
+		//如果目标对象实现了接口，可以强制使用CGLIB动态代理实现AOP
+		//如果目标对象没有实现接口，必须采用CGLIB代理，Spring会自动在JDK动态代理和CGLIB代理之前切换。
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {

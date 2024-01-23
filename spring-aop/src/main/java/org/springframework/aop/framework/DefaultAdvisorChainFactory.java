@@ -59,17 +59,21 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 
 		for (Advisor advisor : config.getAdvisors()) {
+			// 我们这里的Advisor 都是 PointcutAdvisor 所以这里只分析该内容
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
+					//如果代理规则与当前类匹配
 					if (MethodMatchers.matches(mm, method, actualClass, hasIntroductions)) {
+						// 进行转化注册
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method
 							// isn't a problem as we normally cache created chains.
 							for (MethodInterceptor interceptor : interceptors) {
+								// 封装成 InterceptorAndDynamicMethodMatcher
 								interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
 							}
 						}
@@ -91,7 +95,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 				interceptorList.addAll(Arrays.asList(interceptors));
 			}
 		}
-
+		// 返回最终的拦截器集合
 		return interceptorList;
 	}
 

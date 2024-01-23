@@ -89,9 +89,15 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
 		// Add all the Spring advisors found according to superclass rules.
+		// 1. 这里是从BeanFactory 中找出来 所有 Advisor 类型的bean。即找到所有配置的Advisor。
+		// 一般获取的都是通过直接注册的Advisors。比如事务的顾问，直接通过@Bean注入到Spring容器中
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
 		if (this.aspectJAdvisorsBuilder != null) {
+			// 2. buildAspectJAdvisors() 从代码中动态找到了需要的增强点
+			// 要获取我们通过注解方式动态注册的Advisors。比如在Aop中根据不同的表达式，每个@Pointcut注解的切点不同，
+			// 也就会对不同的Bean起作用，并且对于每个@Pointcut来说都有@Before、@After等不同的操作，
+			// 那么每个@Pointcut以及其对应的操作都会被封装成一个一个的Advisor返回。
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}
 		return advisors;
@@ -107,6 +113,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		// proxied by that interface and fail at runtime as the advice method is not
 		// defined on the interface. We could potentially relax the restriction about
 		// not advising aspects in the future.
+		// 是切面相关类 || 是被 @Aspect 注解修饰的类
 		return (super.isInfrastructureClass(beanClass) ||
 				(this.aspectJAdvisorFactory != null && this.aspectJAdvisorFactory.isAspect(beanClass)));
 	}
