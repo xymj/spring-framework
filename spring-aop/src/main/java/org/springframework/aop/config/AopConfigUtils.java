@@ -61,6 +61,7 @@ public abstract class AopConfigUtils {
 		// Set up the escalation list...
 		// 这里面三种都是 自动代理创建器，会根据情况选择一个自动代理创建器加载。
 		// 需要注意的是，自动代理创建器只能加载一种，若已经加载一种，则会根据优先级选择优先级高的重新加载
+		// 优先级： InfrastructureAdvisorAutoProxyCreator < AspectJAwareAdvisorAutoProxyCreator < AnnotationAwareAspectJAutoProxyCreator
 		// 事务使用
 		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);

@@ -37,6 +37,8 @@ public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFa
 	@Nullable
 	private TransactionAttributeSource transactionAttributeSource;
 
+	// Pointcut(判断是否可以作用于当前方法) 和 Advice(作用于当前方法的具体逻辑)。
+	// 一个方法是否需要使用事务，是通过 TransactionAttributeSourcePointcut#matches方法判断的
 	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {
 		@Override
 		@Nullable

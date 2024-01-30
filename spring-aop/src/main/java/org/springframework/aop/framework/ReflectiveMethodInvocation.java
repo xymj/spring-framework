@@ -177,7 +177,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			// 如果当前增强匹配当前的方法，则调用增强
 			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {
 				// 调用 拦截器的 invoke 方法
-				return dm.interceptor.invoke(this);
+				return dm.interceptor.invoke(this); // 传递this实现递归调用process实现interceptor chain执行
 			}
 			else {
 				// Dynamic matching failed.
@@ -192,7 +192,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			// 普通的拦截器，直接调用拦截器。我们一般都走这里
 			// 将this 作为参数传递以保证当前实力中的调用链路的执行
 			// 直接调用 Advice 的 invoke 方法
-			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
+			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);  // 传递this实现递归调用process实现interceptor chain执行
 		}
 	}
 

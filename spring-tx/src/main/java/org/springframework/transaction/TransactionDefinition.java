@@ -43,6 +43,15 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.transaction.support.DefaultTransactionDefinition
  * @see org.springframework.transaction.interceptor.TransactionAttribute
  */
+// 事务传播属性
+
+// PROPAGATION_NESTED和PROPAGATION_REQUIRES_NEW的区别：
+//		PROPAGATION_REQUIRES_NEW启动一个新的, 不依赖于环境的 “内部” 事务. 这个事务将被完全commited或rolledback而不依赖于外部事务,它拥有自己的隔离范围, 自己的锁, 等等.
+//			当内部事务开始执行时, 外部事务将被挂起, 内务事务结束时, 外部事务将继续执行. PROPAGATION_REQUIRES_NEW常用于日志记录,或者交易失败仍需要留痕
+//	    PROPAGATION_NESTED开始一个 “嵌套的” 事务, 它是已经存在事务的一个真正的子事务. 潜套事务开始执行时, 它将取得一个savepoint.
+//	   		如果这个嵌套事务失败, 我们将回滚到此savepoint. 潜套事务是外部事务的一部分,只有外部事务结束后它才会被提交.
+// PROPAGATION_REQUIRES_NEW 和 PROPAGATION_NESTED 的最大区别在于:
+//		PROPAGATION_REQUIRES_NEW完全是一个新的事务, 而PROPAGATION_NESTED则是外部事务的子事务, 如果外部事务commit, 潜套事务也会被commit, 这个规则同样适用于roll back.
 public interface TransactionDefinition {
 
 	/**
@@ -51,6 +60,7 @@ public interface TransactionDefinition {
 	 * <p>This is typically the default setting of a transaction definition,
 	 * and typically defines a transaction synchronization scope.
 	 */
+	// 支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。即如果上级具有事务，则使用上级的事务，不具备则自己新建一个事务
 	int PROPAGATION_REQUIRED = 0;
 
 	/**
@@ -72,6 +82,7 @@ public interface TransactionDefinition {
 	 * @see org.springframework.transaction.support.AbstractPlatformTransactionManager#setTransactionSynchronization
 	 * @see org.springframework.transaction.support.AbstractPlatformTransactionManager#SYNCHRONIZATION_ON_ACTUAL_TRANSACTION
 	 */
+	// 支持当前事务，如果当前没有事务，就以非事务方式执行。即如果上级具有事务，则使用上级的事务，如果上级没有事务，则不开启事务
 	int PROPAGATION_SUPPORTS = 1;
 
 	/**
@@ -80,6 +91,7 @@ public interface TransactionDefinition {
 	 * <p>Note that transaction synchronization within a {@code PROPAGATION_MANDATORY}
 	 * scope will always be driven by the surrounding transaction.
 	 */
+	// 支持当前事务，如果当前没有事务，就抛出异常。即如果上级具有事务，则使用上级的事务，上级没有事务，则抛出异常
 	int PROPAGATION_MANDATORY = 2;
 
 	/**
@@ -95,6 +107,7 @@ public interface TransactionDefinition {
 	 * and resumed appropriately.
 	 * @see org.springframework.transaction.jta.JtaTransactionManager#setTransactionManager
 	 */
+	// 新建事务，如果当前存在事务，把当前事务挂起。即如果上级存在事务，则挂起上级事务，使用自己新创建的事务
 	int PROPAGATION_REQUIRES_NEW = 3;
 
 	/**
@@ -110,6 +123,7 @@ public interface TransactionDefinition {
 	 * will be suspended and resumed appropriately.
 	 * @see org.springframework.transaction.jta.JtaTransactionManager#setTransactionManager
 	 */
+	// 以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。即如果上级具有事务，则使用挂起上级事务，使用非事务方式。
 	int PROPAGATION_NOT_SUPPORTED = 4;
 
 	/**
@@ -118,6 +132,7 @@ public interface TransactionDefinition {
 	 * <p>Note that transaction synchronization is <i>not</i> available within a
 	 * {@code PROPAGATION_NEVER} scope.
 	 */
+	// 以非事务方式执行，如果当前存在事务，则抛出异常
 	int PROPAGATION_NEVER = 5;
 
 	/**
@@ -131,6 +146,7 @@ public interface TransactionDefinition {
 	 * nested transactions as well.
 	 * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
 	 */
+	// 如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。
 	int PROPAGATION_NESTED = 6;
 
 

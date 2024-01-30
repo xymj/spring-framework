@@ -50,6 +50,7 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 	private BeanFactory beanFactory;
 
 	@Nullable
+	// Advice(作用于当前方法的具体逻辑)
 	private transient volatile Advice advice;
 
 	private transient volatile Object adviceMonitor = new Object();
