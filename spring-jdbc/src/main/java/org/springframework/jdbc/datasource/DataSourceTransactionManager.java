@@ -284,6 +284,11 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
+				// 设置为手动提交，或者START TRANSACTION;都能开启事务
+				// 三种打开注解方式：
+					// begin;  --->   commit;(rollback;)
+					// start transaction;  --->   commit;(rollback;)
+				    // set autocommit=0  --->   commit;(rollback;)  这种方式执行完事务必须恢复autocommit=1，否则数据库所有SQL执行不会自动commit，需要手动commit
 				con.setAutoCommit(false);
 			}
 			// 准备事务连接，这里实际上执行了 SET TRANSACTION READ ONLY 的sql 语句
@@ -385,7 +390,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		Connection con = txObject.getConnectionHolder().getConnection();
 		try {
 			if (txObject.isMustRestoreAutoCommit()) {
-				// 恢复数据库连接自动提交属性
+				// 恢复数据库连接自动提交属性，最终一定要设置 autocommit=true，保证当前事务执行结束后开启事务自动提交
 				con.setAutoCommit(true);
 			}
 			// 重置数据连接

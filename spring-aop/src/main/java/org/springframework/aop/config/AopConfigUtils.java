@@ -122,7 +122,7 @@ public abstract class AopConfigUtils {
 
 	@Nullable
 	private static BeanDefinition registerOrEscalateApcAsRequired(
-			// 当cls是AnnotationAwareAspectJAutoProxyCreator.class
+			// 当是切面注解时cls是AnnotationAwareAspectJAutoProxyCreator.class，当是事务切面注解时cls是InfrastructureAdvisorAutoProxyCreator.class
 			Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
